@@ -1,10 +1,13 @@
 const getRss = require('./template')
 const { match, pathToRegexp } = require('path-to-regexp')
 
+const debug = WK_DEBUG == "on" // eslint-disable-line
+const prefix = !debug ? WK_PRE: "" // eslint-disable-line
 async function route(event) {
   const url = new URL(event.request.url)
   let data = await to(
     event,
+    prefix+
     '/jandan/article',
     url.pathname,
     require('../routes/jandan/article'),
@@ -12,6 +15,7 @@ async function route(event) {
   if (data) return data
   data = await to(
     event,
+    prefix+
     '/jandan/:sub_model',
     url.pathname,
     require('../routes/jandan/pic'),

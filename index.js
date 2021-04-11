@@ -1,5 +1,4 @@
 const route = require('./src/utils/router')
-const debug = false
 addEventListener('fetch', event => {
   try {
     return event.respondWith(handleRequest(event))
@@ -27,7 +26,7 @@ async function handleRequest(event) {
   // console.log("============debugger=============")
   // console.log(response)
   // console.log("============debugger=============")
-  if (!response || debug) {
+  if (!response || WK_DEBUG == 'on') {// eslint-disable-line
     const data = await route(event)
     let init = {
       headers: {
@@ -41,7 +40,10 @@ async function handleRequest(event) {
     // will limit the response to be in cache for 10 seconds max
 
     // Any changes made to the response here will be reflected in the cached value
-    response.headers.append('Cache-Control', 's-maxage=' + debug ? 0 : '300')
+    response.headers.append(
+      'Cache-Control',
+      's-maxage=' + WK_DEBUG == 'on' ? 0 : '300',// eslint-disable-line
+    )
 
     // Store the fetched response as cacheKey
     // Use waitUntil so you can return the response without blocking on

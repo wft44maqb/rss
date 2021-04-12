@@ -2,8 +2,8 @@ const Router = require('@/utils/router')
 const getRss = require('@/utils/template')
 
 const r = new Router()
-r.get('/jiandan/article', compose(require('@/routes/jandan/article')))
-r.get('/jiandan/:sub_model', compose(require('@/routes/jandan/pic')))
+r.get(WK_PRE + '/jiandan/article', compose(require('@/routes/jandan/article')))
+r.get(WK_PRE + '/jiandan/:sub_model', compose(require('@/routes/jandan/pic')))
 
 addEventListener('fetch', event => {
   try {
@@ -39,12 +39,13 @@ async function handleRequest(event) {
     // Any changes made to the response here will be reflected in the cached value
     response.headers.append(
       'Cache-Control',
-      's-maxage=' + WK_DEBUG == 'on' ? 0 : '60', // eslint-disable-line
+      's-maxage=' + (WK_DEBUG == 'on' ? 0 : '60'), // eslint-disable-line
     )
 
     // Store the fetched response as cacheKey
     // Use waitUntil so you can return the response without blocking on
     // writing to cache
+    //
     event.waitUntil(cache.put(cacheKey, response.clone()))
   }
   return response

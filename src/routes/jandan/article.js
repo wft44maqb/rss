@@ -9,7 +9,7 @@
    }
  * */
 const cheerio = require('cheerio')
-const got = require('../../utils/got')
+const got = require('@/utils/got')
 
 module.exports = async () => {
   const url = 'http://jandan.net'

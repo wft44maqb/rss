@@ -1,5 +1,5 @@
 /**
- * get html content by url
+ * get content by url
  * @param url
  * @param init config
  *

@@ -1,12 +1,10 @@
-const parse = require("./template-web")
+const parse = require('@/utils/rss')
 const config = {
   titleLengthLimit: 30,
   type: 'rss',
 }
 const unsupportedRegex = /\.json$/
-
-module.exports = async (event, data) => {
-  let request = event.request
+module.exports = (request, data) => {
   if (request.url.match(unsupportedRegex)) {
     return '<b>JSON output had been removed, see: <a href="https://github.com/DIYgod/RSSHub/issues/1114">https://github.com/DIYgod/RSSHub/issues/1114</a></b>'
   }

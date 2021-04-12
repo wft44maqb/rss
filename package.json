@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "rss",
-  "version": "1.0.0",
-  "description": "A template for kick starting a Cloudflare Workers project",
+  "name": "rsshub-wroker",
+  "version": "0.1.0",
+  "description": "An rsshub run on cloudflare wroker",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

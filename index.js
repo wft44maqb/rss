@@ -1,4 +1,10 @@
-const route = require('./src/utils/router')
+const Router = require('@/utils/router')
+const getRss = require('@/utils/template')
+
+const r = new Router()
+r.get('/jiandan/article', compose(require('@/routes/jandan/article')))
+r.get('/jiandan/:sub_model', compose(require('@/routes/jandan/pic')))
+
 addEventListener('fetch', event => {
   try {
     return event.respondWith(handleRequest(event))
@@ -23,18 +29,9 @@ async function handleRequest(event) {
   // if not, you will need to fetch it from origin, and store it in the cache
   // for future access
   let response = await cache.match(cacheKey)
-  // console.log("============debugger=============")
-  // console.log(response)
-  // console.log("============debugger=============")
-  if (!response || WK_DEBUG == 'on') {// eslint-disable-line
-    const data = await route(event)
-    let init = {
-      headers: {
-        'content-type': 'application/xml;charset=UTF-8',
-      },
-    }
 
-    response = new Response(data, init)
+  if (!response || WK_DEBUG == 'on') {
+    response = await handleRoute(event.request)
 
     // Cache API respects Cache-Control headers. Setting s-max-age to 10
     // will limit the response to be in cache for 10 seconds max
@@ -42,7 +39,7 @@ async function handleRequest(event) {
     // Any changes made to the response here will be reflected in the cached value
     response.headers.append(
       'Cache-Control',
-      's-maxage=' + WK_DEBUG == 'on' ? 0 : '300',// eslint-disable-line
+      's-maxage=' + WK_DEBUG == 'on' ? 0 : '60', // eslint-disable-line
     )
 
     // Store the fetched response as cacheKey
@@ -51,4 +48,24 @@ async function handleRequest(event) {
     event.waitUntil(cache.put(cacheKey, response.clone()))
   }
   return response
+}
+
+function compose(fn) {
+  return async function(req, params) {
+    let data = await fn(params)
+
+    data = getRss(req, data)
+    let init = {
+      headers: {
+        'content-type': 'application/xml;charset=utf-8',
+      },
+    }
+
+    return new Response(data, init)
+  }
+}
+
+// set routes needed
+async function handleRoute(request) {
+  return await r.route(request)
 }

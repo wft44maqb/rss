@@ -1,45 +1,96 @@
-const getRss = require('./template')
 const { match, pathToRegexp } = require('path-to-regexp')
 
-const debug = WK_DEBUG == "on" // eslint-disable-line
-const prefix = !debug ? WK_PRE: "" // eslint-disable-line
-async function route(event) {
-  const url = new URL(event.request.url)
-  let data = await to(
-    event,
-    prefix+
-    '/jandan/article',
-    url.pathname,
-    require('../routes/jandan/article'),
-  )
-  if (data) return data
-  data = await to(
-    event,
-    prefix+
-    '/jandan/:sub_model',
-    url.pathname,
-    require('../routes/jandan/pic'),
-  )
-  if (data) return data
+/**
+ *  Helper functions that when passed a request will return a
+ *  boolean indicating if the request uses that HTTP method,
+ *  header, host or referrer.
+ *
+ *  2021-04-12
+ *  copy from "https://github.com/cloudflare/worker-template-router/blob/master/router.js"
+ *  add Params method
+ * */
 
-  return 'not match'
+const Method = method => req => {
+  return req.method.toLowerCase() === method.toLowerCase()
+
+}
+const Get = Method('get')
+
+// const Header = (header, val) => req => req.headers.get(header) === val
+// const Host = host => Header('host', host.toLowerCase())
+// const Referrer = host => Header('referrer', host.toLowerCase())
+
+const Path = patten => req => {
+  const regExp = pathToRegexp(patten)
+  const url = new URL(req.url)
+  const path = url.pathname
+
+  return regExp.test(path)
 }
 
-async function to(event, patten, pathname, handler) {
-  let params = {}
-  const regexp = pathToRegexp(patten)
-  if (regexp.test(pathname)) {
-    const fn = match(patten, { decode: decodeURIComponent })
-    params = fn(pathname).params
+const Param = patten => req => {
+  const fn = match(patten, { decode: decodeURIComponent })
+  const url = new URL(req.url)
+  const path = url.pathname
+  return fn(path).params
+}
 
-    // console.log('===============debugger start ===============')
-    // console.log(handler, params, pathname)
-    // console.log('===============debugger end ===============')
-    let data = await handler(params)
-    return await getRss(event, data)
+/**
+ *  The Router handles determines which handler is matched given the
+ *  conditions present for each request.
+ *  */
+class Router {
+  constructor() {
+    this.routes = []
   }
 
-  return ''
+  // add params to get params
+  handle(conditions, handler, params = {}) {
+    this.routes.push({
+      conditions,
+      handler,
+      params,
+    })
+  }
+
+
+  get(url, handler) {
+    return this.handle([Get, Path(url)], handler, Param(url))
+  }
+
+
+  route(req) {
+    const route = this.resolve(req)
+    if (route) {
+      return route.handler(req, route.params(req))
+    }
+
+    return new Response('resource not found', {
+      status: 404,
+      statusText: 'not found',
+      headers: {
+        'content-type': 'text/plain',
+      },
+    })
+  }
+
+  /**
+   *  resolve returns the matching route for a request that returns
+   *  true for all conditions (if any).
+   * */
+  resolve(req) {
+    return this.routes.find(r => {
+      if (!r.conditions || (Array.isArray(r) && !r.conditions.length)) {
+        return true
+      }
+
+      if (typeof r.conditions === 'function') {
+        return r.conditions(req)
+      }
+
+      return r.conditions.every(c => c(req))
+    })
+  }
 }
 
-module.exports = route
+module.exports = Router

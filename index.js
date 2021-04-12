@@ -39,7 +39,7 @@ async function handleRequest(event) {
     // Any changes made to the response here will be reflected in the cached value
     response.headers.append(
       'Cache-Control',
-      's-maxage=' + (WK_DEBUG == 'on' ? 0 : '60'), // eslint-disable-line
+      'public, s-maxage=' + (WK_DEBUG == 'on' ? 0 : '60'), // eslint-disable-line
     )
 
     // Store the fetched response as cacheKey

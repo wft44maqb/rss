@@ -8,4 +8,5 @@ parserOptions:
 globals:
   WK_DEBUG: readonly
   WK_PRE: readonly
+  TransformStream: readonly
 rules: {}

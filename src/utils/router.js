@@ -59,6 +59,10 @@ class Router {
   }
 
 
+  all(handler) {
+    return this.handle([], handler)
+  }
+
   route(req) {
     const route = this.resolve(req)
     if (route) {

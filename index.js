@@ -33,9 +33,8 @@ async function handleRequest(event) {
   if (!response || WK_DEBUG == 'on') {
     response = await handleRoute(event.request)
 
-    // Cache API respects Cache-Control headers. Setting s-max-age to 10
-    // will limit the response to be in cache for 10 seconds max
-
+    // Cache API respects Cache-Control headers. Setting s-max-age to 60
+    // will limit the response to be in cache for 60 seconds max
     // Any changes made to the response here will be reflected in the cached value
     response.headers.append(
       'Cache-Control',
@@ -45,16 +44,15 @@ async function handleRequest(event) {
     // Store the fetched response as cacheKey
     // Use waitUntil so you can return the response without blocking on
     // writing to cache
-    //
     event.waitUntil(cache.put(cacheKey, response.clone()))
   }
+
   return response
 }
 
 function compose(fn) {
   return async function(req, params) {
     let data = await fn(params)
-
     data = getRss(req, data)
     let init = {
       headers: {

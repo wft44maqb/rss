@@ -1,0 +1,8 @@
+name = "rss"
+type = "webpack"
+account_id = "xxxxxxxxxxxxx"
+workers_dev = true
+route = "xxxxxxxx/rss/*"
+zone_id = "xxxxxxxxxxx"
+vars = { WK_DEBUG = "off", WK_PRE = "/rss"  }
+webpack_config = "webpack.config.js"

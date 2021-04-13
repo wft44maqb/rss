@@ -1,15 +1,18 @@
-# 👷 `worker-template` Hello World
+# 👷 `rsshub in cloudflare worker`
 
-A template for kick starting a Cloudflare worker project.
+A simple copy of `rsshub`. just for learning worker.
 
-[`index.js`](https://github.com/cloudflare/worker-template/blob/master/index.js) is the content of the Workers script.
+## problem
 
-#### Wrangler
+Beacuse of executed limit in cf wrokers and low quering about cheeio, maybe my bad `china net` also, Error 1102 is common thing i get.
 
-To generate using [wrangler](https://github.com/cloudflare/wrangler)
+## routes support
 
-```
-wrangler generate projectname https://github.com/cloudflare/worker-template
-```
++ `/rss/jiandan/article`
++ `/rss/jiandan/:sub_model`
 
-Further documentation for Wrangler can be found [here](https://developers.cloudflare.com/workers/tooling/wrangler).
+## todo
+
++ Find some way to speed up process about `parse string` and `query html`. Is `HTMLRewriter` a better choice ?
+
+
